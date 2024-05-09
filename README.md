@@ -101,3 +101,14 @@ $ kubectl --namespace minio get deployments
 ```
 $ minikube --namespace minio service minio --url
 ```
+5. Access to one of the links from the previous step and access to MinIO. The user is `minio` and the password is `miniosecret`.
+6. Click on "Create bucket" and create a bucket named `my-bucket`. Let all the options as they are by default:
+![image](https://github.com/memaldi/kubernetes-examples/assets/1871269/403ec032-0066-464f-8396-e8e3584a2712)
+7. Select the bucket created in the previous step and, at the right-top corner, click on the folder icon ("Browse Bucket"):
+![image](https://github.com/memaldi/kubernetes-examples/assets/1871269/9bb076c2-853b-4d57-bb28-b82dd43e109d)
+8. Click on "Create new path" and create a folder called `input`:
+![image](https://github.com/memaldi/kubernetes-examples/assets/1871269/cb5b48c6-b6ec-46b5-8174-046f64930272)
+9. Drag & drop or click into "Upload" to upload the well-known `sonnets.txt` file. You can find this file at `/home/osboxes/hadoop-exercises/wordcount/input/sonnets.txt`:
+![image](https://github.com/memaldi/kubernetes-examples/assets/1871269/00062cbe-14f0-4ee4-9d53-a7bffa888f11)
+
+
