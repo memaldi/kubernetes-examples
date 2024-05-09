@@ -133,8 +133,42 @@ $ minikube --namespace minio service minio --url
 ```
 ![image](https://github.com/memaldi/kubernetes-examples/assets/1871269/7a4de9a9-0143-446e-9fe0-62e997a00630)
 
+## Launch Spark
 
-
-
-    
-
+1. Modify the `wordcount.py` file to set your "Access Key" and "Secret Key".:
+```
+access_key = "access-key"
+secret_key = "secret-key"
+```
+2. Build the Docker image to include the modified code. You must recover the URL of the registry given previously. You can get the URL of the registry executing `minikube --namespace registry service registry-service --url`. Notice that you must remove the schema (`http://`):
+```
+$ docker build -t 192.168.49.2:30920/tgvd/spark-wordcount:v1 .
+```
+3. Push the image to the repository:
+```
+$ docker push 192.168.49.2:30920/tgvd/spark-wordcount:v1
+```
+4. Create the service account `spark` to allow our driver to create the executors:
+```
+$ kubectl create serviceaccount spark
+$ kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
+```
+4. Get the URL of the kubernetes local proxy:
+```
+$ kubectl cluster-info
+```
+You wil get:
+```
+Kubernetes control plane is running at https://192.168.49.2:8443
+```
+4. Launch Spark job. Notice that you must replace the values at `--master` and `--conf spark.kubernetes.container.image=` with your own ones:
+```
+$ spark-submit --master k8s://https://192.168.49.2:8443 \
+    --deploy-mode cluster \
+    --conf spark.executor.instances=2 \
+    --conf spark.kubernetes.container.image=192.168.49.2:30920/tgvd/spark-wordcount:v1 \
+    --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/opt/spark/work-dir/ -Divy.home=/opt/spark/work-dir/" \
+    --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
+    --packages org.apache.hadoop:hadoop-aws:3.3.4 \
+    local:///opt/spark/work-dir/wordcount.py
+```
