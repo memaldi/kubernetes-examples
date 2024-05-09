@@ -62,11 +62,11 @@ $ kubectl delete deployment/nginx-deployment
 
 ## Spark example
 
-### Docker registry
-
 Those steps are executed from the `spark` directory.
 
-1. Create registry namespace:
+### Docker registry
+
+1. Create `registry` namespace:
 ```
 $ kubectl create namespace registry
 ```
@@ -81,4 +81,23 @@ $ kubectl --namespace registry get deployments
 4. Expose the registry. This URL will be used later:
 ```
 minikube --namespace registry service registry-service --url
+```
+
+### MinIO
+
+1. Create `minio` namespace:
+```
+$ kubectl create namespace minio
+```
+2. Deploy MinIO:
+```
+$ kubectl --namespace minio apply -f minio/
+```
+3. Wait until the deployment is ready:
+```
+$ kubectl --namespace minio get deployments
+```
+4. Expose MinIO:
+```
+$ minikube --namespace minio service minio --url
 ```
