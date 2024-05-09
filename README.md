@@ -110,5 +110,31 @@ $ minikube --namespace minio service minio --url
 ![image](https://github.com/memaldi/kubernetes-examples/assets/1871269/cb5b48c6-b6ec-46b5-8174-046f64930272)
 9. Drag & drop or click into "Upload" to upload the well-known `sonnets.txt` file. You can find this file at `/home/osboxes/hadoop-exercises/wordcount/input/sonnets.txt`:
 ![image](https://github.com/memaldi/kubernetes-examples/assets/1871269/00062cbe-14f0-4ee4-9d53-a7bffa888f11)
+10. At the menu on the left, click on "Access Keys" and click on "Create New Access Key":
+![image](https://github.com/memaldi/kubernetes-examples/assets/1871269/49bcdb21-7208-478b-8099-6114e68ed581)
+11. Set an expiration date ("Expiry") from the future and copy the "Access Key" and "Secret Key". **Warning**: once you create the Access Key, you won't be able to check the value of the "Secret Key" again.:
+![image](https://github.com/memaldi/kubernetes-examples/assets/1871269/f1afb8b5-5faf-4064-b201-35004c5bc39f)
+12. Close the pop-up shown when creating the access key or download the JSON with the values if you haven't copied the Access Key and the Secret Key in the previous step.
+13. Click on the access key created in the previous step to add the appropriate policy to allow total access to the bucket `my-bucket` for this access key. Copy the following on the "Access Key Policy" field and click on "Update":
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::my-bucket",
+                "arn:aws:s3:::my-bucket/*"
+            ]
+        }
+    ]
+}
+```
+![image](https://github.com/memaldi/kubernetes-examples/assets/1871269/7a4de9a9-0143-446e-9fe0-62e997a00630)
 
+
+
+
+    
 
