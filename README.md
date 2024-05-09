@@ -59,3 +59,26 @@ $ kubectl logs -f <name-of-the-pod>
 ```
 $ kubectl delete deployment/nginx-deployment
 ```
+
+## Spark example
+
+### Docker registry
+
+Those steps are executed from the `spark` directory.
+
+1. Create registry namespace:
+```
+$ kubectl create namespace registry
+```
+2.  Deploy the registry:
+```
+$ kubectl --namespace registry apply -f registry/
+```
+3. Wait until the deployment is ready:
+```
+$ kubectl --namespace registry get deployments
+```
+4. Expose the registry. This URL will be used later:
+```
+minikube --namespace registry service registry-service --url
+```
