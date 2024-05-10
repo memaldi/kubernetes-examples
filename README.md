@@ -148,11 +148,7 @@ $ docker push 192.168.49.2:30920/tgvd/spark-wordcount:v1
 $ kubectl create serviceaccount spark
 $ kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
 ```
-4. Create the hadoop-config ConfigMap:
-```
-kubectl create configmap hadoop-config --from-file=core-site.xml
-```
-5. Get the URL of the kubernetes local proxy:
+4. Get the URL of the kubernetes local proxy:
 ```
 $ kubectl cluster-info
 ```
@@ -160,7 +156,7 @@ You wil get:
 ```
 Kubernetes control plane is running at https://192.168.49.2:8443
 ```
-6. Launch Spark job. Notice that you must replace the values at `--master` and `--conf spark.kubernetes.container.image=` with your own ones:
+5. Launch Spark job. Notice that you must replace the values at `--master`, `--conf spark.kubernetes.container.image=`, `--conf spark.hadoop.fs.s3a.access.key=` and `--conf spark.hadoop.fs.s3a.secret.key=` with your own ones:
 ```
 $ spark-submit --master k8s://https://192.168.49.2:8443 \
     --deploy-mode cluster \
@@ -168,9 +164,12 @@ $ spark-submit --master k8s://https://192.168.49.2:8443 \
     --conf spark.kubernetes.container.image=192.168.49.2:30920/tgvd/spark-wordcount:v1 \
     --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/opt/spark/work-dir/ -Divy.home=/opt/spark/work-dir/" \
     --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
-    --conf spark.kubernetes.hadoop.configMapName=hadoop-config \
+    --conf spark.hadoop.fs.s3a.endpoint=http://minio.minio.svc.cluster.local:9000 \
+    --conf spark.hadoop.fs.s3a.access.key=YOUR-ACCESS-KEY \
+    --conf spark.hadoop.fs.s3a.secret.key=YOUR-SECRET-KEY \
+    --conf spark.hadoop.fs.s3a.path.style.access=true \
     --packages org.apache.hadoop:hadoop-aws:3.3.4 \
     local:///opt/spark/work-dir/wordcount.py
 ```
-7. You can check the pods created by spark executing `kubectl get all`.
-8. If you want to check the logs from an specific pod, you can execute `kubectl logs -f <name-of-the-pod>`
+6. You can check the pods created by spark executing `kubectl get all`.
+7. If you want to check the logs from an specific pod, you can execute `kubectl logs -f <name-of-the-pod>`
