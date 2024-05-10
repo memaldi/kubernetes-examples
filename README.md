@@ -135,20 +135,15 @@ $ minikube --namespace minio service minio --url
 
 ## Launch Spark
 
-1. Modify the `wordcount.py` file to set your "Access Key" and "Secret Key".:
-```
-access_key = "access-key"
-secret_key = "secret-key"
-```
-2. Build the Docker image to include the modified code. You must recover the URL of the registry given previously. You can get the URL of the registry executing `minikube --namespace registry service registry-service --url`. Notice that you must remove the schema (`http://`):
+1. Build the Docker image to include the wordcount.py file. You must recover the URL of the registry given previously. You can get the URL of the registry executing `minikube --namespace registry service registry-service --url`. Notice that you must remove the schema (`http://`):
 ```
 $ docker build -t 192.168.49.2:30920/tgvd/spark-wordcount:v1 .
 ```
-3. Push the image to the repository:
+2. Push the image to the repository:
 ```
 $ docker push 192.168.49.2:30920/tgvd/spark-wordcount:v1
 ```
-4. Create the service account `spark` to allow our driver to create the executors:
+3. Create the service account `spark` to allow our driver to create the executors:
 ```
 $ kubectl create serviceaccount spark
 $ kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
@@ -161,7 +156,7 @@ You wil get:
 ```
 Kubernetes control plane is running at https://192.168.49.2:8443
 ```
-4. Launch Spark job. Notice that you must replace the values at `--master` and `--conf spark.kubernetes.container.image=` with your own ones:
+5. Launch Spark job. Notice that you must replace the values at `--master`, `--conf spark.kubernetes.container.image=`, `--conf spark.hadoop.fs.s3a.access.key=` and `--conf spark.hadoop.fs.s3a.secret.key=` with your own ones:
 ```
 $ spark-submit --master k8s://https://192.168.49.2:8443 \
     --deploy-mode cluster \
@@ -169,6 +164,12 @@ $ spark-submit --master k8s://https://192.168.49.2:8443 \
     --conf spark.kubernetes.container.image=192.168.49.2:30920/tgvd/spark-wordcount:v1 \
     --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/opt/spark/work-dir/ -Divy.home=/opt/spark/work-dir/" \
     --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
+    --conf spark.hadoop.fs.s3a.endpoint=http://minio.minio.svc.cluster.local:9000 \
+    --conf spark.hadoop.fs.s3a.access.key=YOUR-ACCESS-KEY \
+    --conf spark.hadoop.fs.s3a.secret.key=YOUR-SECRET-KEY \
+    --conf spark.hadoop.fs.s3a.path.style.access=true \
     --packages org.apache.hadoop:hadoop-aws:3.3.4 \
     local:///opt/spark/work-dir/wordcount.py
 ```
+6. You can check the pods created by spark executing `kubectl get all`.
+7. If you want to check the logs from an specific pod, you can execute `kubectl logs -f <name-of-the-pod>`
